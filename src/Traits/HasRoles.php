@@ -2,7 +2,6 @@
 
 namespace Shetabit\Admission\Traits;
 
-use App\Models\Role;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Shetabit\Admission\Contracts\RoleInterface as RoleContract;
@@ -224,14 +223,6 @@ trait HasRoles
         );
 
         return $roles->intersect($this->getRoleNames()) == $roles;
-    }
-
-    /**
-     * Return all permissions directly coupled to the model.
-     */
-    public function getDirectPermissions() : Collection
-    {
-        return $this->permissions;
     }
 
     /**

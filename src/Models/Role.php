@@ -3,10 +3,11 @@
 namespace Shetabit\Admission\Models;
 
 use Shetabit\Admission\Contracts\RoleInterface as RoleContract;
+use Shetabit\Admission\Contracts\RoleInterface;
 use Shetabit\Admission\Traits\{HasPermissions, HasAssociationRelations};
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class Role extends Model implements RoleInterface
 {
     use HasPermissions;
     use HasAssociationRelations;

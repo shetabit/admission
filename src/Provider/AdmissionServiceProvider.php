@@ -26,6 +26,16 @@ class AdmissionServiceProvider extends ServiceProvider
         );
 
         /**
+         * Migrations that needs to be done by user.
+         */
+        $this->publishes(
+            [
+                __DIR__.'/../../database/migrations/' => database_path('migrations')
+            ],
+            'migrations'
+        );
+
+        /**
          * Bind Models' contracts
          */
         $this->registerModelBindings();
@@ -47,7 +57,10 @@ class AdmissionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        /**
+         * Load default configurations.
+         */
+        $this->mergeConfigFrom(__DIR__ . '/../../config/admission.php', 'admission');
     }
 
     /**

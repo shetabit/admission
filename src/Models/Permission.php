@@ -3,10 +3,11 @@
 namespace Shetabit\Admission\Models;
 
 use Shetabit\Admission\Contracts\PermissionInterface as PermissionContract;
+use Shetabit\Admission\Contracts\PermissionInterface;
 use Shetabit\Admission\Traits\HasAssociationRelations;
-use Illuminate\Database\Eloquent\{Model, Relations\MorphTo, Relations\Relation};
+use Illuminate\Database\Eloquent\{Model, Relations\MorphTo, Relations\MorphToMany, Relations\Relation};
 
-class Permission extends Model
+class Permission extends Model implements PermissionInterface
 {
     use HasAssociationRelations;
 
@@ -56,7 +57,7 @@ class Permission extends Model
      *
      * @return mixed
      */
-    public function roles()
+    public function roles() : MorphToMany
     {
         return $this
             ->morphedByMany(config('admission.models.roles'), 'permissionable')

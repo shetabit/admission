@@ -56,7 +56,7 @@ trait HasPermissions
     public function permissions() : MorphToMany
     {
         return $this
-            ->morphToMany(config('permission.models.permission'), 'permissionable')
+            ->morphToMany(config('admission.models.permission'), 'permissionable')
             ->withPivot('forbid',  'own', 'from', 'until')
             ->withTimestamps();
     }

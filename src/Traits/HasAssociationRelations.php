@@ -2,8 +2,7 @@
 
 namespace Shetabit\Admission\Traits;
 
-use App\Models\Permission;
-use App\Models\Role;
+use Shetabit\Admission\Contracts\{PermissionInterface, RoleInterface};
 
 trait HasAssociationRelations
 {
@@ -17,9 +16,9 @@ trait HasAssociationRelations
     public static function associatedBy($relationName, $relationModel)
     {
         static::addDynamicRelation($relationName, function ($model) use ($relationModel) {
-            if ($model instanceof Role) {
+            if ($model instanceof RoleInterface) {
                 $type = 'rolable';
-            } else if ($model instanceof Permission) {
+            } else if ($model instanceof PermissionInterface) {
                 $type = 'permissionable';
             }
 
