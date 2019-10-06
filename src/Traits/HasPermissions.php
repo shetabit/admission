@@ -42,7 +42,7 @@ trait HasPermissions
     public function getPermissionModel() : PermissionContract
     {
         if (! isset($this->permissionModel)) {
-            $this->permissionModel = app(PermissionRegistrar::class)->getPermissionClass();
+            $this->permissionModel = app(PermissionRegistrar::class)->getPermissionModel();
         }
 
         return $this->permissionModel;
@@ -203,7 +203,7 @@ trait HasPermissions
         return $this->permissions->contains('id', $permission->id);
     }
 
-    public function hasPermissionViaRole(Permission $permission)
+    public function hasPermissionViaRole(PermissionContract $permission)
     {
         return $this->hasRole($permission->roles);
     }
