@@ -34,6 +34,17 @@ trait HasDynamicRelations
         return array_key_exists($name, static::$dynamicRelations);
     }
 
+    public static function getDynamicRelationName($relationName)
+    {
+//        dd(static::class);
+        dd(static::$dynamicRelations);
+
+        $reflection = new \ReflectionFunction(static::$dynamicRelations[$relationName]);
+        $relationModelName = $reflection->getStaticVariables();
+
+        return $relationModelName;
+    }
+
     /**
      * If the key exists in relations then return call to relation or else
      * return the call to the parent

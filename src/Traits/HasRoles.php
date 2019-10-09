@@ -25,9 +25,12 @@ trait HasRoles
     {
         static::deleting(
             function ($model) {
-                if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                $isSoftDelete = method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting();
+
+                if ($isSoftDelete) {
                     return;
                 }
+
                 $model->roles()->detach();
             }
         );
@@ -154,22 +157,27 @@ trait HasRoles
      */
     public function hasRole($roles) : bool
     {
+        // convert pipe separated rules to array
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
+        // check by role's name
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
         }
 
+        // check by role's id
         if (is_int($roles)) {
             return $this->roles->contains('id', $roles);
         }
 
+        // check by role's
         if ($roles instanceof RoleContract) {
             return $this->roles->contains('id', $roles->id);
         }
 
+        // check by array of rules
         if (is_array($roles)) {
             foreach ($roles as $role) {
                 if ($this->hasRole($role)) {
@@ -180,6 +188,7 @@ trait HasRoles
             return false;
         }
 
+        // check by collection of rules
         return $roles->intersect($this->roles)->isNotEmpty();
     }
 
@@ -204,24 +213,29 @@ trait HasRoles
      */
     public function hasAllRoles($roles) : bool
     {
+        // convert pipe separated rules to array
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
+        // check by role's name
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
         }
 
+        // check by instance of role's model
         if ($roles instanceof RoleContract) {
             return $this->roles->contains('id', $roles->id);
         }
 
-        $roles = collect()->make($roles)->map(
+        // convert array of role's model to collection of their names
+        $roles = collect($roles)->map(
             function ($role) {
                 return $role instanceof RoleContract ? $role->name : $role;
             }
         );
 
+        // check by collection of role's name
         return $roles->intersect($this->getRoleNames()) == $roles;
     }
 

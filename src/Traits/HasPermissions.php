@@ -26,9 +26,12 @@ trait HasPermissions
     {
         static::deleting(
             function ($model) {
-                if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                $isSoftDelete = method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting();
+
+                if ($isSoftDelete) {
                     return;
                 }
+
                 $model->permissions()->detach();
             }
         );
@@ -174,6 +177,8 @@ trait HasPermissions
     }
 
     /**
+     * Determine if the model as given direct permissions.
+     *
      * @param string|int|PermissionInterface $permission
      *
      * @return bool
@@ -182,6 +187,7 @@ trait HasPermissions
     {
         $permissionModel= $this->getPermissionModel();
 
+        // check by permission's name
         if (is_string($permission)) {
             $permission = $permissionModel->where('name', '=', $permission)->first();
             if (! $permission) {
@@ -189,6 +195,7 @@ trait HasPermissions
             }
         }
 
+        // check by permission's id
         if (is_int($permission)) {
             $permission = $permissionModel->where('id', '=', $permission)->first();
             if (! $permission) {
@@ -200,15 +207,31 @@ trait HasPermissions
             return false;
         }
 
+        // check by permission's model
         return $this->permissions->contains('id', $permission->id);
     }
 
+    /**
+     * Determine if a model has some permissions via its roles.
+     *
+     * @param PermissionInterface $permission
+     *
+     * @return mixed
+     */
     public function hasPermissionViaRole(PermissionContract $permission)
     {
         return $this->hasRole($permission->roles);
     }
 
-    public function hasPermissionTo($action, $entity = null)
+    /**
+     * Determine if the model has permission to run an action over given entity.
+     *
+     * @param $action
+     * @param null $entity
+     *
+     * @return bool
+     */
+    public function hasPermissionTo($action, $entity = null) : bool
     {
         $entity = array_pop($entity);
 
@@ -249,7 +272,7 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|PermissionContract|Collection $permissions
      *
      * @return $this
      */
@@ -323,6 +346,16 @@ trait HasPermissions
         return $this;
     }
 
+
+    public function entitiesHaveAccessTo($model, $entityRelationName = 'permissions', $modelRelationName = 'users')
+    {
+        return $model::whereHas($entityRelationName , function ($query) use ($modelRelationName) {
+            $query->whereHas($modelRelationName, function ($query)  use ($modelRelationName) {
+                $query->where($modelRelationName.'.id', $this->getKey());
+            });
+        });
+    }
+
     /**
      * Get available permissions' name.
      *
@@ -342,12 +375,13 @@ trait HasPermissions
     {
         $permissionModel= $this->getPermissionModel();
 
+
         if (is_numeric($permissions)) {
-            return $permissionModel->findById($permissions, $this->getDefaultGuardName());
+            return $permissionModel->findById($permissions);
         }
 
         if (is_string($permissions)) {
-            return $permissionModel->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionModel->findByName($permissions);
         }
 
         if (is_array($permissions)) {

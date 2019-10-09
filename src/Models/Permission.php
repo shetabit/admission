@@ -42,12 +42,12 @@ class Permission extends Model implements PermissionInterface
      *
      * @param $relationModel
      */
-    public static function givesAccessTo($relationModel, $relationName = 'permissionable')
+    public static function providesAccessTo($relationModel, $relationName = 'permissions')
     {
-        static::addDynamicRelation(
+        $relationModel::addDynamicRelation(
             $relationName,
-            function ($model) use ($relationModel, $relationName) {
-                return $model->morphMany($relationModel, $relationName)->withTimestamps();
+            function ($model) use ($relationModel) {
+                return $model->morphMany(config('admission.models.permission'), 'entity');
             }
         );
     }
@@ -89,7 +89,7 @@ class Permission extends Model implements PermissionInterface
      */
     public static function addEntities(array $entities)
     {
-        foreach($entities as $name => $modelName) {
+        foreach ($entities as $name => $modelName) {
             static::addEntity($name, $modelName);
         }
     }

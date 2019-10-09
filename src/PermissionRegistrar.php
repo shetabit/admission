@@ -39,16 +39,6 @@ class PermissionRegistrar
     }
 
     /**
-     * Get an instance of the permission class.
-     *
-     * @return PermissionInterface
-     */
-    public function getPermissionModel() : PermissionInterface
-    {
-        return app($this->permissionModel);
-    }
-
-    /**
      * Set permission's eloquent model
      *
      * @param $permissionModel
@@ -59,6 +49,16 @@ class PermissionRegistrar
         $this->permissionModel = $permissionModel;
 
         return $this;
+    }
+
+    /**
+     * Get an instance of the permission class.
+     *
+     * @return PermissionInterface
+     */
+    public function getPermissionModel() : PermissionInterface
+    {
+        return app($this->permissionModel);
     }
 
     /**
