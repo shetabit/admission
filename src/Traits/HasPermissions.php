@@ -346,12 +346,19 @@ trait HasPermissions
         return $this;
     }
 
-
-    public function entitiesHaveAccessTo($model, $entityRelationName = 'permissions', $modelRelationName = 'users')
+    /**
+     * Retrieve entities that model has access to them
+     *
+     * @param $model
+     * @param string $entityRelationName
+     * @param string $relationName
+     * @return mixed
+     */
+    public function entitiesHaveAccessTo($model, $relationName = 'users', $entityRelationName = 'permissions')
     {
-        return $model::whereHas($entityRelationName , function ($query) use ($modelRelationName) {
-            $query->whereHas($modelRelationName, function ($query)  use ($modelRelationName) {
-                $query->where($modelRelationName.'.id', $this->getKey());
+        return $model::whereHas($entityRelationName , function ($query) use ($relationName) {
+            $query->whereHas($relationName, function ($query)  use ($relationName) {
+                $query->where($relationName.'.id', $this->getKey());
             });
         });
     }
