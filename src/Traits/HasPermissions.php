@@ -224,6 +224,16 @@ trait HasPermissions
     }
 
     /**
+     * General action matches with all other actions
+     *
+     * @return string
+     */
+    protected function generalAction()
+    {
+        return '*';
+    }
+
+    /**
      * Determine if the model has permission to run an action over given entity.
      *
      * @param $action
@@ -234,10 +244,13 @@ trait HasPermissions
     public function hasPermissionTo($action, $entity = null) : bool
     {
         $entity = array_pop($entity);
-
         $permission = $this
             ->getPermissionModel()
-            ->where('action', '=', $action)
+            ->where(function($query) use ($action) {
+                $query
+                    ->where('action', '=', $action)
+                    ->orWhere('action', '=', $this->generalAction());
+            })
             ->when(
                 !empty($entity),
                 function ($query) use ($entity) {
@@ -246,8 +259,8 @@ trait HasPermissions
                         $entityName = array_search($entityClassName, Relation::$morphMap);
 
                         $query
-                            ->where('name', '=', $entityClassName)
-                            ->orWhere('name', '=', $entityName);
+                            ->where('entity_type', '=', $entityClassName)
+                            ->orWhere('entity_type', '=', $entityName);
                     });
 
                     if (is_object($entity) && !empty($entity->id)) {

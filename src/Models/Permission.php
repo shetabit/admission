@@ -60,7 +60,7 @@ class Permission extends Model implements PermissionInterface
     public function roles() : MorphToMany
     {
         return $this
-            ->morphedByMany(config('admission.models.roles'), 'permissionable')
+            ->morphedByMany(config('admission.models.role'), 'permissionable')
             ->withPivot('from', 'until')
             ->withTimestamps();
     }
